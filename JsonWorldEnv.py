@@ -122,15 +122,12 @@ class SimpleTraverseEnv(StairsBase):
         reward += 0.4 * max(dy, 0)
 
         if dx > 0.08 and dy > 0.002:
-            print("level 3")
             reward += 3.0
 
         elif dx > 0.008 and dy > 0.001:
-            print("level 2")
             reward += 1.0
 
         elif dx > 0.003 and dy > 0.0005:
-            print("level 1")
             reward += 0.01
         if dy>1.65*dx:
             reward -= 0.01
@@ -187,7 +184,6 @@ class SimpleTraverseEnv(StairsBase):
         self.window=0
         x, y = self.get_pos_com_obs(self.robot_name)
         self.prev_x, self.prev_y = x, y
-        print("max_dx:", self.max_dx, "max_dy:", self.max_dy)
         robot_ort = self.object_orientation_at_time(
             self.get_time(), "robot")
         # observation

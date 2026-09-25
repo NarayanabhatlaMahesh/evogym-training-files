@@ -235,7 +235,7 @@ def train_one(body, connections, env_name, env_class, json_paths, idx):
         env_class=env_class,
         json_path=json_paths[0],
         save_path=save_path,
-        eval_freq=10000,
+        eval_freq=100000,
         n_eval_episodes=1,
         deterministic=False,
         verbose=1,
@@ -244,14 +244,13 @@ def train_one(body, connections, env_name, env_class, json_paths, idx):
     eval_env=eval_env,
     best_model_save_path=save_path,
     log_path=save_path,
-    eval_freq=1000,
+    eval_freq=100000,
     n_eval_episodes=1,
     deterministic=False,
     verbose=1,
 )
-    callback = RewardDebugCallback()
 
-    model.learn(total_timesteps=TOTAL_TIMESTEPS, callback=[eval_callback,gifcallback, callback])
+    model.learn(total_timesteps=TOTAL_TIMESTEPS, callback=[eval_callback,gifcallback])
     print(f"\n✅ Training finished for robot {idx}\n")
     os.makedirs(save_path, exist_ok=True)
     model_path = os.path.join(save_path, "final_model")

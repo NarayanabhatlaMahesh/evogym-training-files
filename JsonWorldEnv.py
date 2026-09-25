@@ -76,6 +76,9 @@ class SimpleTraverseEnv(StairsBase):
             except Exception:
                 y+=1
         self.step_count =0
+
+        self.min_reward = float("inf")
+        self.max_reward = float("-inf")
         
         self.dx = 0
         self.dy = 0
@@ -114,24 +117,27 @@ class SimpleTraverseEnv(StairsBase):
         dy = y - self.prev_y
         reward = 0.0
 
-        reward += 0.60 * max(dx, 0)
-        reward += 0.55 * max(dy, 0)
-        self.max_dx = max(self.max_dx, dx)
-        self.max_dy = max(self.max_dy, dy)
+        reward = 0.0
+        reward += 0.8 * max(dx, 0)
+        reward += 0.4 * max(dy, 0)
 
-        if dx >= 0.70 and dy >= 0.6:
-            reward += 6.0
-        elif dx >= 0.7 and dy >= 0.7:
-            reward += 4.0
-        elif dx >= 0.3 and dy >= 0.3:
-            reward += 2.0
-        elif dx >= 0.08 and dy >= 0.07:
-            reward -= 1.0
+        if dx > 0.08 and dy > 0.002:
+            print("level 3")
+            reward += 3.0
 
-        if dx==self.max_dx:
-            reward += 5.5
-        if dy==self.max_dy:
-            reward += 5.5
+        elif dx > 0.008 and dy > 0.001:
+            print("level 2")
+            reward += 1.0
+
+        elif dx > 0.003 and dy > 0.0005:
+            print("level 1")
+            reward += 0.01
+        if dy>1.65*dx:
+            reward -= 0.01
+
+        self.prev_y=y
+        self.prev_x=x
+                
 
 
 
@@ -162,6 +168,14 @@ class SimpleTraverseEnv(StairsBase):
             "max_dx": self.max_dx,
             "max_dy": self.max_dy,
         }
+        self.min_reward = min(self.min_reward, reward)
+        self.max_reward = max(self.max_reward, reward)
+
+        if self.max_reward > self.min_reward:
+            reward = 2.0 * (
+                (reward - self.min_reward) /
+                (self.max_reward - self.min_reward)
+            ) - 1.0
 
         # observation, reward, has simulation met termination conditions, truncated, debugging info
         return obs, reward, done, False, info

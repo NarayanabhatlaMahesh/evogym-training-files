@@ -4,7 +4,7 @@ import pandas as pd
 from PIL import Image
 
 # Import your environment class
-from JsonWorldEnv import SimpleTraverseEnv
+from crawlertraining.JsonWorldEnv import SimpleTraverseEnv
 
 
 DATASET = r"C:\Users\numam\EALLMs\EnvGenPrmtOpt\upsteppers.parquet"

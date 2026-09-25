@@ -3,10 +3,10 @@ import pandas as pd
 import numpy as np
 
 from evogym import EvoWorld
-from JsonWorldEnv import SimpleTraverseEnv
+from crawlertraining.JsonWorldEnv import SimpleTraverseEnv
 
 # Import save_gif from your existing training file
-from TrainNewRobot import save_gif
+from crawlertraining.TrainNewRobot import save_gif
 
 
 # ================= CONFIG =================

@@ -10,7 +10,7 @@ from stable_baselines3 import PPO
 from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize
 
 from evogym import EvoWorld
-from JsonWorldEnv import JsonWorldEnv
+from crawlertraining.JsonWorldEnv import JsonWorldEnv
 
 
 # ================= CONFIG =================

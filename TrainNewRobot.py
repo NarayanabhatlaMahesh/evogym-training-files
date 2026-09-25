@@ -52,13 +52,13 @@ TOTAL_TIMESTEPS = 1000000
 ROBOT_NAME = "robot"
 N_ENVS = 3
 
-ROBOT_CSV = r"C:\Users\numam\EALLMs\EnvGenPrmtOpt\upsteppers.parquet"
-BASE_PATH = r"C:\Users\numam\EALLMs\EnvGenPrmtOpt\saved_modelsNEWW"
+ROBOT_CSV = r"upsteppers.parquet"
+BASE_PATH = r"saved_modelsNEWW"
 TRAINING_ENV_LIST = [
-    r"C:\Users\numam\Desktop\UpStepper-v0.json",
-    r"C:\Users\numam\Desktop\exampleenvnew.json",
-    r"C:\Users\numam\Desktop\exampleenv.json",
-    # r"C:\Users\numam\Desktop\exampleenvold.json",
+    r"env_files\UpStepper-v0.json",
+    r"env_files\exampleenvnew.json",
+    r"env_files\exampleenv.json",
+    # r"env_files\exampleenvold.json",
 ]
 
 # ================= UTILS =================

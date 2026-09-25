@@ -212,7 +212,7 @@ def train_one(body, connections, env_name, env_class, json_paths, idx):
         env,
         learning_rate=2.0e-4,
         verbose=1,
-        n_steps=512,
+        n_steps=256,
         batch_size=32,
         n_epochs=12,
         gamma=0.99,

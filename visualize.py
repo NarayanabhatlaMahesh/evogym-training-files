@@ -3,10 +3,10 @@ import pandas as pd
 import numpy as np
 
 from evogym import EvoWorld
-from crawlertraining.JsonWorldEnv import SimpleTraverseEnv
+from JsonWorldEnv import SimpleTraverseEnv
 
 # Import save_gif from your existing training file
-from crawlertraining.TrainNewRobot import save_gif
+from TrainNewRobot import save_gif
 
 
 # ================= CONFIG =================
@@ -14,24 +14,24 @@ from crawlertraining.TrainNewRobot import save_gif
 ROBOT_NAME = "robot"
 
 
-BASE_PATH = r"C:\Users\numam\EALLMs\EnvGenPrmtOpt\saved_modelsNEWW"
+BASE_PATH = r"saved_modelsNEWW"
 
-ROBOT_INDEX = 1
+ROBOT_INDEX = 91
 
 
-ROBOT_CSV = r"C:\Users\numam\EALLMs\EnvGenPrmtOpt\upsteppers.parquet"
+ROBOT_CSV = r"upsteppers.parquet"
 
-MODEL_PATH = rf"C:\Users\numam\EALLMs\EnvGenPrmtOpt\saved_modelsNEWW\UpStepper-v0\robot_{ROBOT_INDEX}\best_model.zip"
+MODEL_PATH = rf"saved_modelsNEWW\UpStepper-v0\robot_{ROBOT_INDEX}\best_model.zip"
 
-JSON_PATH = r"C:\Users\numam\Desktop\exampleenvnew.json"
+JSON_PATH = r"env_files\exampleenvnew.json"
 
-GIF_PATH = rf"C:\Users\numam\EALLMs\EnvGenPrmtOpt\saved_modelsNEWW\UpStepper-v0\robot_{ROBOT_INDEX}\best_model.gif"
+GIF_PATH = rf"saved_modelsNEWW\UpStepper-v0\robot_{ROBOT_INDEX}\best_model.gif"
 
 
 TRAINING_ENV_LIST = [
-    r"C:\Users\numam\Desktop\exampleenvnew.json",
-    r"C:\Users\numam\Desktop\exampleenvnew.json",
-    r"C:\Users\numam\Desktop\exampleenvnew.json",
+    r"env_files\exampleenvnew.json",
+    r"env_files\exampleenvnew.json",
+    r"env_files\exampleenvnew.json",
 ]
 
 # Robot row used during training

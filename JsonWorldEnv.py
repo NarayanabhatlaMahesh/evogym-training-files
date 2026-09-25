@@ -156,7 +156,7 @@ class SimpleTraverseEnv(StairsBase):
         target_theta = np.deg2rad(63)
         angle_error = abs(abs(theta) - target_theta)
 
-        reward += 1.0 * np.cos(angle_error)
+        reward += 0.05 * np.cos(angle_error)
 
         if abs(theta) > 1.48:
             done = True

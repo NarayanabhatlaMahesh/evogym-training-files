@@ -116,21 +116,23 @@ class SimpleTraverseEnv(StairsBase):
         dx = x - self.prev_x
         dy = y - self.prev_y
         reward = 0.0
-
-        reward = 0.0
         reward += 0.8 * max(dx, 0)
-        reward += 0.8 * max(dy, 0)
+        reward += 0.85 * max(dy, 0)
+        if dx > 0.002:
+            print(f"dx: {dx:.3f} dy: {dy:.3f}", flush=True)
+        
+        if dx > 0.02 and dy > 0.02:
+            print("BIG MOVE", flush=True)
+            reward += 8
 
-        if dx > 0.8 and dy > 0.4:
-            reward += 6.0
+        elif dx > 0.008 and dy > 0.0065:
+            print("MEDIUM MOVE", flush=True)
+            reward += 4
 
-        elif dx > 0.08 and dy > 0.05:
-            reward += 3.0
-
-        elif dx > 0.003 and dy > 0.0005:
+        elif dx > 0.003 and dy > 0.003:
+            reward += 1
+        if dy>=1.65*dx or dy > dx:
             reward += 0.01
-        if dy>1.65*dx:
-            reward -= 0.01
 
         self.prev_y=y
         self.prev_x=x
@@ -152,11 +154,6 @@ class SimpleTraverseEnv(StairsBase):
 
         theta = self.get_ort_obs(self.robot_name)[0]
         theta = (theta + np.pi) % (2 * np.pi) - np.pi
-
-        target_theta = np.deg2rad(63)
-        angle_error = abs(abs(theta) - target_theta)
-
-        reward += 0.05 * np.cos(angle_error)
 
         if abs(theta) > 1.48:
             done = True

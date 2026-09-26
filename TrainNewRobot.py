@@ -86,16 +86,6 @@ def safe_add_robot(world, body, connections):
     return False
 
 # ================= ENV FACTORY =================
-def make_env(body, connections, json_path, env_class, r_mode):
-    def _init():
-        env = env_class(
-            body=body,
-            connections=connections,
-            path=json_path,
-            render_mode=r_mode,
-        )
-        return Monitor(env)
-    return _init
 
 def make_env_eval(body, connections, json_path, env_class, r_mode):
     def _init():
@@ -121,11 +111,8 @@ def save_gif(body, connections, env_class, json_path, model_path, gif_path):
 
 
     model = PPO.load(model_path, device="cpu")
-
     obs, info = env.reset()
-
     frames = []
-
     try:
         for step in range(800):
             action, _ = model.predict(obs, deterministic=False)
@@ -134,32 +121,22 @@ def save_gif(body, connections, env_class, json_path, model_path, gif_path):
             frames.append(np.asarray(frame).copy())
             if terminated or truncated:
                 break
-
     finally:
         print("Skipping viewer.close()...", flush=True)
-
         print("Closing environment...", flush=True)
-
         try:
             env.close()
         except Exception as e:
             print(f"env.close() failed: {e}", flush=True)
-
     print(f"Writing {len(frames)} frames", flush=True)
-
     if not frames:
         raise RuntimeError("No frames generated")
-
     imageio.mimsave(
         str(gif_path),
         frames,
         fps=24,
     )
-
     print("GIF WRITTEN", flush=True)
-
-
-# ================= CALLBACK =================
 class GIFEvalCallback(EvalCallback):
     def __init__(self, eval_env, body, connections, env_class, json_path, save_path, **kwargs):
         save_path = Path(save_path)
@@ -212,15 +189,15 @@ def train_one(body, connections, env_name, env_class, json_paths, idx):
         env,
         learning_rate=2.0e-4,
         verbose=1,
-        n_steps=256,
-        batch_size=32,
-        n_epochs=12,
+        n_steps=384,
+        batch_size=48,
+        n_epochs=6,
         gamma=0.99,
         gae_lambda=0.95,
-        vf_coef=0.11,
+        vf_coef=0.5,
         max_grad_norm=0.52,
-        ent_coef=0.015,
-        clip_range=0.24,
+        ent_coef=0.01,
+        clip_range=0.09,
         tensorboard_log=os.path.join(save_path, "tensorboard"),
     )
 

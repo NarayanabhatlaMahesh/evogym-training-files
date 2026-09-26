@@ -119,13 +119,13 @@ class SimpleTraverseEnv(StairsBase):
 
         reward = 0.0
         reward += 0.8 * max(dx, 0)
-        reward += 0.4 * max(dy, 0)
+        reward += 0.8 * max(dy, 0)
 
-        if dx > 0.08 and dy > 0.002:
+        if dx > 0.8 and dy > 0.4:
+            reward += 6.0
+
+        elif dx > 0.08 and dy > 0.05:
             reward += 3.0
-
-        elif dx > 0.008 and dy > 0.001:
-            reward += 1.0
 
         elif dx > 0.003 and dy > 0.0005:
             reward += 0.01

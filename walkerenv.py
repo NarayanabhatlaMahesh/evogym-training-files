@@ -186,15 +186,10 @@ class JsonWorldEnv(EvoGymBase):
         tilt_penalty = -0.6 * (theta ** 2)
         ang_vel_penalty = -0.2 * (ang_vel ** 2)
 
-        # Smooth stagnation penalty
         stagnation_penalty = -0.15 * self.stagnant_steps
 
         # Small alive penalty
         alive_penalty = -0.1
-
-        # -----------------------
-        # PROGRESSIVE BONUSES
-        # -----------------------
         p = self.global_step / self.total_timesteps
 
         # 1. Early exploration (encourage movement)
@@ -237,11 +232,6 @@ class JsonWorldEnv(EvoGymBase):
         if theta < -1.2:
             reward -= 10.0
             return self._get_obs(), np.clip(reward, -10.0, 8.0), True, False, {}
-
-        # -----------------------
-        # FINAL CLIP
-        # -----------------------
-        reward = np.clip(reward, -10.0, 8.0)
 
         truncated = self.step_count >= self.max_steps
         return self._get_obs(), reward, False, truncated, {}

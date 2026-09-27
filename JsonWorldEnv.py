@@ -90,9 +90,9 @@ class SimpleTraverseEnv(StairsBase):
         # set action space and observation space
         num_actuators = self.get_actuator_indices('robot').size
         num_robot_points = self.object_pos_at_time(self.get_time(), "robot").size
-        self.sight_dist = 6
+        self.sight_dist = 4
 
-        self.action_space = spaces.Box(low= 0.1, high=1.9, shape=(num_actuators,), dtype=float)
+        self.action_space = spaces.Box(low= 0.6, high=1.6, shape=(num_actuators,), dtype=float)
         self.observation_space = spaces.Box(low=-100.0, high=100.0, shape=(3 + num_robot_points + (2*self.sight_dist +1),), dtype=float)
 
     def step(self, action):
@@ -116,63 +116,28 @@ class SimpleTraverseEnv(StairsBase):
         dx = x - self.prev_x
         dy = y - self.prev_y
         reward = 0.0
-        reward += 0.8 * max(dx, 0)
-        reward += 0.85 * max(dy, 0)
-        if dx > 0.002:
-            print(f"dx: {dx:.3f} dy: {dy:.3f}", flush=True)
-        
-        if dx > 0.02 and dy > 0.02:
-            print("BIG MOVE", flush=True)
-            reward += 8
-
-        elif dx > 0.008 and dy > 0.0065:
-            print("MEDIUM MOVE", flush=True)
-            reward += 4
-
-        elif dx > 0.003 and dy > 0.003:
-            reward += 1
-        if dy>=1.65*dx or dy > dx:
-            reward += 0.01
-
-        self.prev_y=y
-        self.prev_x=x
-                
-
-
-
-        if dy > 1.5 * max(dx, 1e-6):
-            reward -= 0.1
+        reward = dx
+             
+        self.prev_x, self.prev_y = x,y
+    
+        #error check unstable simulation
         if done:
             print("SIMULATION UNSTABLE... TERMINATING")
-            reward -= 10.5
+            reward -= 3.0
 
         #check termination conditions
         com_pos = np.mean(robot_pos_final, axis=1)
         if com_pos[0] > 69 * self.VOXEL_SIZE:
-            reward += 30.0
+            reward += 3.0
             done = True
-
-        theta = self.get_ort_obs(self.robot_name)[0]
-        theta = (theta + np.pi) % (2 * np.pi) - np.pi
-
-        if abs(theta) > 1.48:
+    
+        if robot_ort_final > (math.pi/2 - math.pi/12) and robot_ort_final < (3*math.pi/2 + math.pi/12):
             done = True
-            reward -= 10.5
-        info = {
-            "max_dx": self.max_dx,
-            "max_dy": self.max_dy,
-        }
-        self.min_reward = min(self.min_reward, reward)
-        self.max_reward = max(self.max_reward, reward)
-
-        if self.max_reward > self.min_reward:
-            reward = 2.0 * (
-                (reward - self.min_reward) /
-                (self.max_reward - self.min_reward)
-            ) - 1.0
+            reward -= 3.0
+    
 
         # observation, reward, has simulation met termination conditions, truncated, debugging info
-        return obs, reward, done, False, info
+        return obs, reward, done, False, {}
 
 
     def reset(self, seed: Optional[int] = None, options: Optional[Dict[str, Any]] = None) -> Tuple[np.ndarray, Dict[str, Any]]:

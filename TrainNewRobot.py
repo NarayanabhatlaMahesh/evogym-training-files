@@ -1,6 +1,7 @@
 from evogym.envs.base import Any, BenchmarkBase, Dict, EvoGymBase, EvoViewer, EvoWorld, Optional, Tuple
 
 from stable_baselines3.common.env_util import make_vec_env
+from stable_baselines3.common.callbacks import CheckpointCallback
 
 import logging
 import os
@@ -48,7 +49,7 @@ os.environ["OMP_NUM_THREADS"] = "1"
 # ================= CONFIG =================
 SEED = 84
 DEVICE = "cpu"
-TOTAL_TIMESTEPS = 1000000
+TOTAL_TIMESTEPS = 10000000
 ROBOT_NAME = "robot"
 N_ENVS = 3
 
@@ -218,16 +219,24 @@ def train_one(body, connections, env_name, env_class, json_paths, idx):
         verbose=1,
     )
     eval_callback = EvalCallback(
-    eval_env=eval_env,
-    best_model_save_path=save_path,
-    log_path=save_path,
-    eval_freq=10000,
-    n_eval_episodes=1,
-    deterministic=False,
-    verbose=1,
-)
+        eval_env=eval_env,
+        best_model_save_path=save_path,
+        log_path=save_path,
+        eval_freq=10000,
+        n_eval_episodes=1,
+        deterministic=False,
+        verbose=1,
+    )
+    checkpoint_callback = CheckpointCallback(
+        save_freq=250000,
+        save_path=save_path,
+        name_prefix="checkpoint",
+        save_replay_buffer=False,
+        save_vecnormalize=False,
+    )
 
-    model.learn(total_timesteps=TOTAL_TIMESTEPS, callback=[eval_callback,gifcallback])
+
+    model.learn(total_timesteps=TOTAL_TIMESTEPS, callback=[eval_callback,gifcallback,checkpoint_callback])
     print(f"\n✅ Training finished for robot {idx}\n")
     os.makedirs(save_path, exist_ok=True)
     model_path = os.path.join(save_path, "final_model")

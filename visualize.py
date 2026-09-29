@@ -21,7 +21,7 @@ ROBOT_INDEX = 91
 
 ROBOT_CSV = r"upsteppers.parquet"
 
-MODEL_PATH = rf"saved_modelsNEWW\UpStepper-v0\robot_{ROBOT_INDEX}\checkpoint_975000_steps.zip"
+MODEL_PATH = rf"saved_modelsNEWW\UpStepper-v0\robot_{ROBOT_INDEX}\checkpoint_300000_steps.zip"
 
 JSON_PATH = r"env_files\exampleenvnew.json"
 

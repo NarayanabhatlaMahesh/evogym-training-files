@@ -63,7 +63,7 @@ class SimpleTraverseEnv(StairsBase):
         self.prev_x, self.prev_y = 0,0
 
         self.window=0
-        self.prev_grounded=False
+
 
         # make world
         self.world = EvoWorld.from_json(path)
@@ -82,12 +82,6 @@ class SimpleTraverseEnv(StairsBase):
         
         self.dx = 0
         self.dy = 0
-        
-        self.stage = 0
-        self.prev_x = 0.0
-        self.prev_y = 0.0
-        self.hop_count = 0
-        self.hop_start_x = 0.0
         self.max_dx,self.max_dy=0,0
 
         # init sim
@@ -98,27 +92,96 @@ class SimpleTraverseEnv(StairsBase):
         num_robot_points = self.object_pos_at_time(self.get_time(), "robot").size
         self.sight_dist = 4
 
-        self.action_space = spaces.Box(low= 0.01, high=1.99, shape=(num_actuators,), dtype=float)
+        self.action_space = spaces.Box(low= 0.1, high=1.9, shape=(num_actuators,), dtype=float)
         self.observation_space = spaces.Box(low=-100.0, high=100.0, shape=(3 + num_robot_points + (2*self.sight_dist +1),), dtype=float)
 
-    def check_ground_contact(self, dy, robot_pos):
-        lowest_y = np.min(robot_pos[1, :])
-        tolerance = 0.1 * self.VOXEL_SIZE
-        is_near_ground = lowest_y <= tolerance
-        is_grounded = is_near_ground and dy <= 0
-        return is_grounded
- 
+    def step(self, action):
+        # collect pre step information
+        self.total_steps += 1
+        robot_pos_init = self.object_pos_at_time(self.get_time(), "robot")
+        for _ in range(1):
+            done = super().step({'robot': action})
+        
+        robot_pos_final = self.object_pos_at_time(self.get_time(), "robot")
+        robot_ort_final = self.object_orientation_at_time(self.get_time(), "robot")
+        obs = np.concatenate((
+            self.get_vel_com_obs("robot"),
+            np.array([robot_ort_final]),
+            self.get_relative_pos_obs("robot"),
+            self.get_floor_obs("robot", ["ground"], self.sight_dist),
+            ))
+        
+        # compute reward
+        x,y=self.get_pos_com_obs(self.robot_name)
+        dx = x - self.prev_x
+        dy = y - self.prev_y
+        reward = 0.0
+
+        reward = 0.0
+        reward += 0.8 * max(dx, 0)
+        reward += 0.4 * max(dy, 0)
+
+        if dx > 0.011 and dy > 0.009:
+            print("max fired")
+            reward += 12.0
+        
+        elif dx > 0.009 and dy > 0.009:
+            print("below max fired")
+            reward += 8.5
+
+        elif dx > 0.006 and dy > 0.006:
+            print("next level fired")
+            reward += 6.5
+
+        elif dx > 0.003 and dy > 0.003:
+            print("base fired")
+            reward += 2.01
+        
+
+        self.prev_y=y
+        self.prev_x=x
+                
+
+
+
+        if dy > 1.5 * max(dx, 1e-6):
+            reward -= 0.1
+        if done:
+            print("SIMULATION UNSTABLE... TERMINATING")
+            reward -= 10.5
+
+        #check termination conditions
+        com_pos = np.mean(robot_pos_final, axis=1)
+        if com_pos[0] > 69 * self.VOXEL_SIZE:
+            reward += 30.0
+            done = True
+
+        theta = self.get_ort_obs(self.robot_name)[0]
+        theta = (theta + np.pi) % (2 * np.pi) - np.pi
+
+        target_theta = np.deg2rad(63)
+        angle_error = abs(abs(theta) - target_theta)
+
+        reward += 0.05 * np.cos(angle_error)
+
+        if abs(theta) > 1.48:
+            done = True
+            reward -= 10.5
+        info = {
+            "max_dx": self.max_dx,
+            "max_dy": self.max_dy,
+        }
+
+        # observation, reward, has simulation met termination conditions, truncated, debugging info
+        return obs, reward, done, False, info
+
+
     def reset(self, seed: Optional[int] = None, options: Optional[Dict[str, Any]] = None) -> Tuple[np.ndarray, Dict[str, Any]]:
         
         super().reset(seed=seed, options=options)
         self.window=0
         x, y = self.get_pos_com_obs(self.robot_name)
         self.prev_x, self.prev_y = x, y
-        self.hop_start_x = x
-        self.prev_grounded = self.check_ground_contact(
-            0, self.object_pos_at_time(self.get_time(), self.robot_name)
-        )
-
         robot_ort = self.object_orientation_at_time(
             self.get_time(), "robot")
         # observation
@@ -162,77 +225,4 @@ class SimpleTraverseEnv(StairsBase):
             super().close()
         except Exception:
             pass
-
-    def set_curriculum_stage(self, stage):
-        self.stage = min(3, max(0, int(stage)))
-
-
-    def compute_reward(self, dx, dy, grounded, goal, fallen, action):
-        takeoff = self.prev_grounded and not grounded
-        landing = not self.prev_grounded and grounded
-
-        reward = 10.0 * dx - 0.01
-
-        reward += [0.5, 1.0, 1.5, 2.0][self.stage] * max(dy, 0)
-
-        if takeoff:
-            self.hop_start_x = self.prev_x
-
-        if landing:
-            hop_progress = max(self.prev_x - self.hop_start_x, 0)
-            reward += min(2.0 * hop_progress, 5.0)
-
-        if goal:
-            reward += 100.0
-
-        if fallen:
-            reward -= 50.0
-
-        self.prev_grounded = grounded
-        return reward
-
-
-    def step(self, action):
-        pos_init = self.object_pos_at_time(self.get_time(), self.robot_name)
-        com_init = np.mean(pos_init, axis=1)
-
-        super().step({self.robot_name: action})
-
-        pos_final = self.object_pos_at_time(self.get_time(), self.robot_name)
-        com_final = np.mean(pos_final, axis=1)
-
-        dx = com_final[0] - com_init[0]
-        dy = com_final[1] - com_init[1]
-
-        self.dx, self.dy = dx, dy
-        self.max_dx = max(self.max_dx, dx)
-        self.max_dy = max(self.max_dy, dy)
-
-        grounded = self.check_ground_contact(dy, pos_final)
-        orientation = self.object_orientation_at_time(self.get_time(), self.robot_name)
-
-        fallen = com_final[1] < -self.VOXEL_SIZE
-        goal = com_final[0] > 69 * self.VOXEL_SIZE
-
-        reward = self.compute_reward(dx, dy, grounded, goal, fallen, action)
-
-        self.prev_x, self.prev_y = com_final
-        self.total_steps += 1
-
-        obs = np.concatenate((
-            self.get_vel_com_obs(self.robot_name),
-            np.array([orientation]),
-            self.get_relative_pos_obs(self.robot_name),
-            self.get_floor_obs(self.robot_name, ["ground"], self.sight_dist),
-        ))
-
-        return obs, reward, fallen or goal, False, {
-            "x": com_final[0],
-            "y": com_final[1],
-            "stage": self.stage,
-            "grounded": grounded,
-            "goal": goal,
-        }
-
-
 

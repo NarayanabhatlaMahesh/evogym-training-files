@@ -49,7 +49,7 @@ os.environ["OMP_NUM_THREADS"] = "1"
 # ================= CONFIG =================
 SEED = 84
 DEVICE = "cpu"
-TOTAL_TIMESTEPS = 10000000
+TOTAL_TIMESTEPS = 1000000
 ROBOT_NAME = "robot"
 N_ENVS = 3
 
@@ -96,7 +96,7 @@ def make_env_eval(body, connections, json_path, env_class, r_mode):
             path=json_path,
             render_mode=r_mode,
         )
-        env = TimeLimit(env, max_episode_steps=500)
+        env = TimeLimit(env, max_episode_steps=1200)
         return Monitor(env)
     return _init
 
@@ -115,7 +115,7 @@ def save_gif(body, connections, env_class, json_path, model_path, gif_path):
     obs, info = env.reset()
     frames = []
     try:
-        for step in range(800):
+        for step in range(1200):
             action, _ = model.predict(obs, deterministic=False)
             obs, reward, terminated, truncated, info = env.step(action)
             frame = env.render(mode="img")
@@ -228,7 +228,7 @@ def train_one(body, connections, env_name, env_class, json_paths, idx):
         verbose=1,
     )
     checkpoint_callback = CheckpointCallback(
-        save_freq=250000,
+        save_freq=25000,
         save_path=save_path,
         name_prefix="checkpoint",
         save_replay_buffer=False,

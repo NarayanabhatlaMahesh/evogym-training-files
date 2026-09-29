@@ -21,7 +21,7 @@ ROBOT_INDEX = 91
 
 ROBOT_CSV = r"upsteppers.parquet"
 
-MODEL_PATH = rf"saved_modelsNEWW\UpStepper-v0\robot_{ROBOT_INDEX}\best_model.zip"
+MODEL_PATH = rf"saved_modelsNEWW\UpStepper-v0\robot_{ROBOT_INDEX}\checkpoint_975000_steps.zip"
 
 JSON_PATH = r"env_files\exampleenvnew.json"
 
@@ -29,9 +29,9 @@ GIF_PATH = rf"saved_modelsNEWW\UpStepper-v0\robot_{ROBOT_INDEX}\best_model.gif"
 
 
 TRAINING_ENV_LIST = [
-    r"env_files\exampleenvnew.json",
-    r"env_files\exampleenvnew.json",
-    r"env_files\exampleenvnew.json",
+    r"env_files\UpStepper-v0.json",
+    r"env_files\UpStepper-v0.json",
+    r"env_files\UpStepper-v0.json",
 ]
 
 # Robot row used during training

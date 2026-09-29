@@ -120,20 +120,21 @@ class SimpleTraverseEnv(StairsBase):
         reward = 0.0
         reward += 0.8 * max(dx, 0)
         reward += 0.4 * max(dy, 0)
-
-        if dx > 0.011 and dy > 0.009:
+        if dx>0.1:
+            reward+=20
+        if dx > 0.011 and dy > 0.005:
             print("max fired")
             reward += 12.0
         
-        elif dx > 0.009 and dy > 0.009:
+        elif dx > 0.009 and dy > 0.0065:
             print("below max fired")
             reward += 8.5
 
-        elif dx > 0.006 and dy > 0.006:
+        elif dx > 0.0065 and dy > 0.0045:
             print("next level fired")
             reward += 6.5
 
-        elif dx > 0.003 and dy > 0.003:
+        elif dx > 0.0035 and dy > 0.0015:
             print("base fired")
             reward += 2.01
         

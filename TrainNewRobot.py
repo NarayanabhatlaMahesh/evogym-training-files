@@ -49,17 +49,17 @@ os.environ["OMP_NUM_THREADS"] = "1"
 # ================= CONFIG =================
 SEED = 84
 DEVICE = "cpu"
-TOTAL_TIMESTEPS = 1000000
+TOTAL_TIMESTEPS = 2500000
 ROBOT_NAME = "robot"
-N_ENVS = 3
+N_ENVS = 6
 
-ROBOT_CSV = r"upsteppers.parquet"
+ROBOT_CSV = r"Jumper.parquet"
 BASE_PATH = r"saved_modelsNEWW"
 TRAINING_ENV_LIST = [
     r"env_files\UpStepper-v0.json",
     r"env_files\exampleenvnew.json",
     r"env_files\exampleenv.json",
-    # r"env_files\exampleenvold.json",
+    r"env_files\exampleenvold.json",
 ]
 
 # ================= UTILS =================
@@ -115,7 +115,7 @@ def save_gif(body, connections, env_class, json_path, model_path, gif_path):
     obs, info = env.reset()
     frames = []
     try:
-        for step in range(1200):
+        for step in range(1800):
             action, _ = model.predict(obs, deterministic=False)
             obs, reward, terminated, truncated, info = env.step(action)
             frame = env.render(mode="img")
@@ -334,14 +334,15 @@ def run_robot(args):
 def main():
     df = pd.read_parquet(ROBOT_CSV)
     filtered_df = (
-        df[df["env_name"] == "UpStepper-v0"]
+        df[df["env_name"] == "Jumper-v0"]
         .dropna(subset=["body", "connections"])
         .reset_index(drop=True)
     )
     df = filtered_df
     print("Loaded DF", flush=True)
+    print(df.head())
 
-    for i in range(91,92):
+    for i in range(5):
         env_name = df.iloc[i]["env_name"]
 
         print(f"\n{'='*60}", flush=True)

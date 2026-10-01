@@ -21,7 +21,7 @@ ROBOT_INDEX = 91
 
 ROBOT_CSV = r"upsteppers.parquet"
 
-MODEL_PATH = rf"saved_modelsNEWW\UpStepper-v0\robot_{ROBOT_INDEX}\checkpoint_900000_steps.zip"
+MODEL_PATH = rf"saved_modelsNEWW\UpStepper-v0\robot_{ROBOT_INDEX}\checkpoint_2250000_steps.zip"
 
 JSON_PATH = r"env_files\exampleenvnew.json"
 
@@ -29,9 +29,10 @@ GIF_PATH = rf"saved_modelsNEWW\UpStepper-v0\robot_{ROBOT_INDEX}\best_model.gif"
 
 
 TRAINING_ENV_LIST = [
+    r"env_files\exampleenv.json",
     r"env_files\UpStepper-v0.json",
-    r"env_files\UpStepper-v0.json",
-    r"env_files\UpStepper-v0.json",
+    r"env_files\exampleenvnew.json",
+    r"env_files\exampleenvold.json",
 ]
 
 # Robot row used during training
@@ -105,14 +106,19 @@ def generate_gif():
         )
 
     # Call your EXISTING save_gif()
-    save_gif(
-        body=body,
-        connections=connections,
-        env_class=ENV_CLASS,
-        json_path=TRAINING_ENV_LIST[2],
-        model_path=model_path,
-        gif_path=gif_path,
-    )
+    for i in range(0,3):
+        gif_path = os.path.join(
+                save_path,
+                f"result_new{i}.gif"
+            )
+        save_gif(
+            body=body,
+            connections=connections,
+            env_class=ENV_CLASS,
+            json_path=TRAINING_ENV_LIST[i],
+            model_path=model_path,
+            gif_path=gif_path,
+        )
 
     print("\n✅ GIF generation completed.")
 
